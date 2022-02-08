@@ -14,6 +14,7 @@ import type { ServerRoute } from "./routes";
 import { createRoutes } from "./routes";
 import { json, isRedirectResponse, isCatchResponse } from "./responses";
 import { createServerHandoffString } from "./serverHandoff";
+import {addEtag, return304IfFresh} from "./etags";
 
 /**
  * The main request handler for a Remix server. This handler runs in the context
@@ -78,6 +79,9 @@ export function createRequestHandler(
         statusText: response.statusText
       });
     }
+
+    response = await addEtag(response);
+    response = return304IfFresh(request, response)
 
     return response;
   };
